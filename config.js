@@ -12,4 +12,4 @@
 //  export const GOOGLE_CLIENT_ID = "1234567890-abc123.apps.googleusercontent.com";
 // ============================================================
 
-export const GOOGLE_CLIENT_ID = "";
+export const GOOGLE_CLIENT_ID = "16821500106-0q1dcprqauddca0mt0o6vo83egla2hbt.apps.googleusercontent.com";
