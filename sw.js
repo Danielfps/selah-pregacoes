@@ -1,6 +1,6 @@
 /* Selah – service worker: cache offline, lembretes e notificações. */
 /* global SelahReminderCore */
-const VERSION = '1.1.0';
+const VERSION = '1.2.0';
 const CACHE = 'selah-' + VERSION;
 
 const APP_SHELL = [
@@ -20,6 +20,7 @@ const APP_SHELL = [
   'js/app.js',
   'js/auth.js',
   'js/backup.js',
+  'js/bible-search.js',
   'js/components.js',
   'js/db.js',
   'js/docbuilder.js',

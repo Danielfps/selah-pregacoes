@@ -7,6 +7,8 @@ import { blobs, queue } from '../db.js';
 import { enqueue, enqueueDelete } from '../sync.js';
 import * as Rec from '../recorder.js';
 import { tagTone } from '../components.js';
+import { searchBooks } from '../bible-search.js';
+import { reconnectIfExpired } from '../auth.js';
 
 const BASIC = { id: 'basico', title: 'Básico', short: 'Básico', emoji: '🗓️' };
 const EXTRAS = { id: 'extras', title: 'Anexos e etiquetas', short: 'Extras', emoji: '📎' };
@@ -197,27 +199,78 @@ export function renderEditor(root, { id }) {
   }
 
   function refPicker(ref, onChange, { compact = false } = {}) {
-    const book = h('select', { class: 'input select', 'aria-label': 'Livro' },
-      h('option', { value: '' }, 'Livro…'),
-      h('optgroup', { label: 'Antigo Testamento' }, BIBLE.filter((b) => b.testament === 'AT').map((b) => h('option', { value: b.name }, b.name))),
-      h('optgroup', { label: 'Novo Testamento' }, BIBLE.filter((b) => b.testament === 'NT').map((b) => h('option', { value: b.name }, b.name)))
-    );
-    book.value = ref.book || '';
+    const bookBtn = h('button', { class: 'input book-btn', type: 'button', 'aria-label': 'Escolher livro da Bíblia' });
     const chap = h('select', { class: 'input select', 'aria-label': 'Capítulo' });
     const verses = h('input', { class: 'input', type: 'text', inputmode: 'text', placeholder: 'vers. ex.: 16-18', 'aria-label': 'Versículos', value: ref.verses || '', autocomplete: 'off' });
+    function drawBook() {
+      clear(bookBtn);
+      bookBtn.append(icon('search'), h('span', { class: ref.book ? '' : 'placeholder' }, ref.book || 'Buscar livro… (ex.: lev, jo 3:16)'));
+      bookBtn.classList.toggle('filled', !!ref.book);
+    }
     function fillChapters() {
       clear(chap);
-      const b = bookByName(book.value);
+      const b = bookByName(ref.book);
       chap.appendChild(h('option', { value: '' }, 'Cap.'));
       if (b) for (let i = 1; i <= b.chapters; i++) chap.appendChild(h('option', { value: String(i) }, String(i)));
       chap.disabled = !b;
       chap.value = ref.chapter ? String(ref.chapter) : '';
     }
+    drawBook();
     fillChapters();
-    book.addEventListener('change', () => { ref.book = book.value; ref.chapter = ''; fillChapters(); onChange(); });
+    bookBtn.addEventListener('click', () => openBookSearch((r) => {
+      ref.book = r.book.name;
+      ref.chapter = r.chapter ? String(r.chapter) : '';
+      if (r.chapter) ref.verses = r.verses || '';
+      verses.value = ref.verses || '';
+      drawBook(); fillChapters(); onChange();
+      vibrate(8);
+      if (!ref.chapter) setTimeout(() => chap.focus(), 250);
+    }));
     chap.addEventListener('change', () => { ref.chapter = chap.value; onChange(); });
     verses.addEventListener('input', () => { ref.verses = verses.value; onChange(); });
-    return h('div', { class: 'ref-picker' + (compact ? ' compact' : '') }, book, h('div', { class: 'ref-row' }, chap, verses));
+    return h('div', { class: 'ref-picker' + (compact ? ' compact' : '') }, bookBtn, h('div', { class: 'ref-row' }, chap, verses));
+  }
+
+  /** Folha de busca de livro: tolera falta de acento, abreviações e erros de digitação. */
+  function openBookSearch(onPick) {
+    const input = h('input', { class: 'input', type: 'search', placeholder: 'Digite: lev, joao 3:16, salmo 23…', 'aria-label': 'Buscar livro', autocomplete: 'off', autocapitalize: 'none', spellcheck: 'false', enterkeyhint: 'go' });
+    const results = h('div', { class: 'option-list book-results' });
+    let current = [];
+    const pick = (r) => { sh.close(); onPick(r); };
+    const used = usedBooks();
+    const row = (r) => h('button', { class: 'option', type: 'button', onclick: () => pick(r) },
+      h('span', null, h('b', null, r.book.name + (r.chapter ? ` ${r.chapter}${r.verses ? ':' + r.verses : ''}` : '')), h('small', null, `${r.book.testament === 'AT' ? 'Antigo' : 'Novo'} Testamento · ${r.book.chapters} ${r.book.chapters === 1 ? 'capítulo' : 'capítulos'}`)),
+      icon('chevronRight'));
+    const draw = () => {
+      clear(results);
+      const q = input.value.trim();
+      if (!q) {
+        current = [];
+        if (used.length) {
+          results.appendChild(h('p', { class: 'option-group' }, 'Mais usados por você'));
+          results.appendChild(h('div', { class: 'chips book-chips' }, used.map((b) => h('button', { class: 'pick', type: 'button', onclick: () => pick({ book: b, chapter: null, verses: '' }) }, b.name))));
+        }
+        ['AT', 'NT'].forEach((t) => {
+          results.appendChild(h('p', { class: 'option-group' }, t === 'AT' ? 'Antigo Testamento' : 'Novo Testamento'));
+          results.appendChild(h('div', { class: 'chips book-chips' }, BIBLE.filter((b) => b.testament === t).map((b) => h('button', { class: 'pick', type: 'button', onclick: () => pick({ book: b, chapter: null, verses: '' }) }, b.name))));
+        });
+        return;
+      }
+      current = searchBooks(q, 8);
+      if (!current.length) { results.appendChild(h('p', { class: 'field-hint center' }, 'Nenhum livro encontrado. Tente só as primeiras letras.')); return; }
+      current.forEach((r) => results.appendChild(row(r)));
+    };
+    input.addEventListener('input', draw);
+    input.addEventListener('keydown', (e) => { if (e.key === 'Enter' && current[0]) { e.preventDefault(); pick(current[0]); } });
+    draw();
+    const sh = sheet('Livro da Bíblia', h('div', null, input, h('p', { class: 'field-hint' }, 'Não precisa de acento. Dá para digitar a referência inteira, como “jo 3 16” ou “1co 13:4-7”.'), results), { autofocus: true });
+  }
+
+  function usedBooks() {
+    const count = new Map();
+    state.sermons.forEach((x) => [x.baseText && x.baseText.book, ...(x.supportVerses || []).map((v) => v.book)].filter(Boolean)
+      .forEach((n) => count.set(n, (count.get(n) || 0) + 1)));
+    return [...count.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6).map(([n]) => bookByName(n)).filter(Boolean);
   }
 
   // ---------- Etapa: Básico ----------
@@ -571,6 +624,7 @@ export function renderEditor(root, { id }) {
 
   // ---------- Saída ----------
   async function finish() {
+    reconnectIfExpired(); // precisa acontecer já no toque, antes de qualquer espera
     const miss = missingEssentials(s);
     if (miss.length) {
       const goOn = await confirmSheet('Faltam alguns campos essenciais',

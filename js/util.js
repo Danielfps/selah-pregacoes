@@ -188,7 +188,9 @@ export function sheet(title, content, opts = {}) {
   const onKey = (e) => { if (e.key === 'Escape') close(); };
   document.addEventListener('keydown', onKey);
   const focusable = panel.querySelector('input, select, textarea, button:not(.icon-btn)');
-  setTimeout(() => (opts.autofocus && focusable ? focusable : panel.querySelector('.icon-btn'))?.focus(), 50);
+  // Foco imediato (ainda dentro do toque) para o teclado abrir no celular.
+  if (opts.autofocus && focusable) focusable.focus({ preventScroll: true });
+  else setTimeout(() => panel.querySelector('.icon-btn')?.focus(), 50);
   let closed = false;
   function close() {
     if (closed) return;
