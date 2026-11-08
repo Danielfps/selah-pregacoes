@@ -140,6 +140,7 @@ export function renderSettings(root) {
       h('p', { class: 'set-note' }, h('b', null, 'Selah'), ' (“pausa para refletir”) – registre e lembre as pregações que você ouve. Versão ', APP_VERSION, '.'),
       h('p', { class: 'set-note' }, 'Suas anotações ficam neste aparelho e na sua conta Google. Nada é enviado para outro servidor.'),
       state.settings.lastSyncAt ? h('p', { class: 'field-hint' }, `Última sincronização ${timeAgo(state.settings.lastSyncAt)}`) : null,
+      h('a', { class: 'btn btn-ghost btn-block', href: 'privacidade.html', target: '_blank', rel: 'noopener' }, icon('info'), 'Política de privacidade'),
       h('a', { class: 'btn btn-ghost btn-block', href: 'https://github.com/Danielfps/selah-pregacoes#readme', target: '_blank', rel: 'noopener' }, icon('external'), 'Ajuda e código-fonte')));
   }
   draw();

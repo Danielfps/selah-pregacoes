@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Selah – Política de Privacidade</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <style>
+    :root { --bg: #F4F1EA; --ink: #1E1B2E; --muted: #5B5670; --primary: #5537E6; --card: #FFFCF5; }
+    @media (prefers-color-scheme: dark) { :root { --bg: #15131F; --ink: #F4F1EA; --muted: #B9B4CC; --primary: #B3A1FF; --card: #221F33; } }
+    body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+    main { max-width: 720px; margin: 0 auto; padding: 24px 16px 48px; }
+    h1 { font-size: 28px; line-height: 1.2; } h2 { font-size: 19px; margin-top: 28px; }
+    a { color: var(--primary); } .muted { color: var(--muted); font-size: 14px; }
+    .card { background: var(--card); border: 2px solid var(--ink); border-radius: 18px; padding: 4px 18px; }
+  </style>
+</head>
+<body>
+<main>
+  <p><a href="./">← Voltar ao Selah</a></p>
+  <h1>Política de Privacidade do Selah</h1>
+  <p class="muted">Última atualização: novembro de 2026</p>
+
+  <div class="card">
+    <p><strong>Resumo:</strong> o Selah não tem servidor e não coleta seus dados. Suas anotações ficam no seu aparelho e, se você conectar, na sua própria conta Google.</p>
+  </div>
+
+  <h2>1. O que é o Selah</h2>
+  <p>O Selah é um aplicativo gratuito para registrar e lembrar pregações. Ele funciona inteiramente no seu navegador.</p>
+
+  <h2>2. Onde ficam suas anotações</h2>
+  <p>Tudo o que você escreve, as fotos e os áudios são guardados no armazenamento do seu próprio aparelho (IndexedDB do navegador). Nada é enviado para servidores do Selah, porque eles não existem.</p>
+
+  <h2>3. Conexão com o Google</h2>
+  <p>Se você escolher “Conectar ao Google Docs”, o Selah pede acesso apenas ao escopo <code>drive.file</code>. Com ele, o app só pode ver e alterar os arquivos que ele mesmo criou no seu Google Drive (a pasta “Selah – Pregações”, os documentos das pregações e a subpasta “Anexos”). O Selah <strong>não</strong> consegue ver seus outros arquivos, e-mails ou contatos.</p>
+  <p>A comunicação acontece diretamente entre o seu navegador e o Google. O Selah lê o nome, o e-mail e a foto da sua conta apenas para mostrar em qual conta você está conectado, e essa informação fica só no seu aparelho.</p>
+  <p>O uso e a transferência de informações recebidas das APIs do Google seguem a <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener">Política de Dados do Usuário dos Serviços de API do Google</a>, incluindo os requisitos de Uso Limitado.</p>
+
+  <h2>4. O que não fazemos</h2>
+  <p>Não vendemos, não compartilhamos e não analisamos seus dados. Não há anúncios, nem rastreamento, nem cookies de terceiros.</p>
+
+  <h2>5. Como apagar seus dados</h2>
+  <p>Para apagar do aparelho, exclua as pregações no app ou limpe os dados do site no navegador. Para apagar do Google, exclua a pasta “Selah – Pregações” no seu Drive. Para remover o acesso do Selah à sua conta, acesse <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener">myaccount.google.com/permissions</a>.</p>
+
+  <h2>6. Contato</h2>
+  <p>Dúvidas: abra uma conversa em <a href="https://github.com/Danielfps/selah-pregacoes/issues" target="_blank" rel="noopener">github.com/Danielfps/selah-pregacoes</a>.</p>
+</main>
+</body>
+</html>
