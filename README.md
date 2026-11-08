@@ -53,7 +53,9 @@ Enquanto não estiver configurado, o Selah funciona normalmente, mas salva só n
    - **URIs de redirecionamento autorizados:** `https://danielfps.github.io/selah-pregacoes/`
      (é usado no login alternativo “Entrar pelo navegador”, útil no iPhone).
    - Clique em **Criar** e copie o **ID do cliente** (termina com `.apps.googleusercontent.com`).
-5. **Cole o ID no `config.js`.** Aqui no GitHub, abra o arquivo [`config.js`](config.js), toque no lápis (✏️ *Edit*) e deixe assim:
+5. **Cole o ID no app (mais fácil):** abra o Selah › **Ajustes › Como configurar**, cole o ID no campo e toque em **Salvar ID** e depois em **Conectar ao Google Docs**. Pronto.
+
+   *Ou, para valer em todos os aparelhos,* cole o ID no `config.js`. Aqui no GitHub, abra o arquivo [`config.js`](config.js), toque no lápis (✏️ *Edit*) e deixe assim:
    ```js
    export const GOOGLE_CLIENT_ID = "1234567890-abc123.apps.googleusercontent.com";
    ```

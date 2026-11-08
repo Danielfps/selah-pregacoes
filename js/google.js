@@ -12,7 +12,19 @@ const DOCS = 'https://docs.googleapis.com/v1/documents';
 export class AuthError extends Error { constructor(m) { super(m || 'Sua conexão com o Google expirou.'); this.name = 'AuthError'; } }
 export class NetError extends Error { constructor(m) { super(m || 'Sem conexão com a internet.'); this.name = 'NetError'; } }
 
-export function clientId() { return typeof GOOGLE_CLIENT_ID === 'string' ? GOOGLE_CLIENT_ID.trim() : ''; }
+const CLIENT_KEY = 'selah.clientId';
+/** ID do cliente: o do config.js ou, se vazio, o colado no próprio app (Ajustes). */
+export function clientId() {
+  const fromConfig = typeof GOOGLE_CLIENT_ID === 'string' ? GOOGLE_CLIENT_ID.trim() : '';
+  if (fromConfig) return fromConfig;
+  try { return (localStorage.getItem(CLIENT_KEY) || '').trim(); } catch (_) { return ''; }
+}
+export function hasConfigFileId() { return typeof GOOGLE_CLIENT_ID === 'string' && GOOGLE_CLIENT_ID.trim().length > 0; }
+export function isValidClientId(v) { return /^[\w-]+\.apps\.googleusercontent\.com$/.test(String(v || '').trim()); }
+export function setClientId(v) {
+  try { if (v) localStorage.setItem(CLIENT_KEY, v.trim()); else localStorage.removeItem(CLIENT_KEY); } catch (_) { /* ignore */ }
+  tokenClient = null;
+}
 export function isConfigured() { return clientId().length > 0; }
 
 // ---------- Token ----------

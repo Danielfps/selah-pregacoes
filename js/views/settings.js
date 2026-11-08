@@ -52,7 +52,7 @@ export function renderSettings(root) {
     } else {
       accountBody = h('div', null,
         h('p', { class: 'set-note' }, 'Entre com o Google para salvar cada pregação como um documento do Google Docs na pasta “Selah – Pregações” do seu Drive. O Selah só acessa os arquivos que ele mesmo cria.'),
-        h('button', { class: 'btn btn-google btn-block', type: 'button', onclick: () => login() }, h('span', { class: 'g-logo', 'aria-hidden': 'true' }, 'G'), 'Entrar com o Google'));
+        h('button', { class: 'btn btn-google btn-block', type: 'button', onclick: () => login() }, h('span', { class: 'g-logo', 'aria-hidden': 'true' }, 'G'), 'Conectar ao Google Docs'));
     }
     wrap.appendChild(group('Conta Google', 'cloud', accountBody));
 

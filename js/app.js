@@ -30,7 +30,7 @@ const routes = [
   { re: /^#\/p\/([^/]+)\/editar$/, view: (root, m) => renderEditor(root, { id: decodeURIComponent(m[1]) }), editor: true },
   { re: /^#\/estatisticas$/, view: renderStats, nav: 'stats' },
   { re: /^#\/config$/, view: renderSettings, nav: 'settings' },
-  { re: /^#\/configurar-google$/, view: renderSetup },
+  { re: /^#\/configurar-google(\?.*)?$/, view: renderSetup },
 ];
 
 let cleanup = null;
