@@ -141,9 +141,13 @@ Alterar só o `config.js` não precisa disso.
 
 ### GitHub Pages
 
-O site é publicado pelo GitHub Pages a partir da raiz do repositório.
-Se precisar ativar de novo: **Settings › Pages › Build and deployment › Source: Deploy from a branch**,
-escolha o branch e a pasta **/ (root)** e salve.
+O site é publicado pelo GitHub Pages a partir do branch **`gh-pages`**.
+Você não precisa mexer nele: a cada commit no branch principal, o workflow
+[`.github/workflows/publicar.yml`](.github/workflows/publicar.yml) copia o código para o `gh-pages`
+e o site se atualiza em 1–2 minutos (acompanhe na aba **Actions**).
+
+Se algum dia o site sair do ar: **Settings › Pages › Build and deployment › Source: Deploy from a branch**,
+escolha o branch **`gh-pages`** e a pasta **/ (root)** e salve.
 
 ---
 

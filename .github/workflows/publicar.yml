@@ -1,0 +1,31 @@
+# Publica o app no GitHub Pages.
+# O Pages serve o branch "gh-pages". A cada commit no branch principal
+# (por exemplo, ao preencher o config.js pelo site do GitHub), este workflow
+# copia o branch principal para o "gh-pages" e o site se atualiza em 1–2 minutos.
+name: Publicar no GitHub Pages
+
+on:
+  push:
+    branches-ignore:
+      - gh-pages
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publicar-pages
+  cancel-in-progress: true
+
+jobs:
+  publicar:
+    if: github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar o código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Atualizar o branch gh-pages
+        run: git push --force origin HEAD:refs/heads/gh-pages
