@@ -172,7 +172,11 @@ export function toast(msg, opts = {}) {
 /** Abre uma folha inferior. content: Node. Retorna { close }. */
 export function sheet(title, content, opts = {}) {
   const prevFocus = document.activeElement;
-  const backdrop = h('div', { class: 'sheet-backdrop', onclick: (e) => { if (e.target === backdrop) close(); } });
+  const backdrop = h('div', { class: 'sheet-backdrop' + (opts.top ? ' sheet-top' : ''), onclick: (e) => { if (e.target === backdrop) close(); } });
+  // Acompanha a área visível da tela: quando o teclado abre, a folha fica acima dele.
+  const vv = window.visualViewport;
+  const fit = () => { if (!vv) return; backdrop.style.top = vv.offsetTop + 'px'; backdrop.style.height = vv.height + 'px'; backdrop.style.bottom = 'auto'; };
+  if (vv) { vv.addEventListener('resize', fit); vv.addEventListener('scroll', fit); fit(); }
   const panel = h('div', { class: 'sheet', role: 'dialog', 'aria-modal': 'true', 'aria-label': title },
     h('div', { class: 'sheet-handle', 'aria-hidden': 'true' }),
     h('div', { class: 'sheet-head' },
@@ -196,6 +200,7 @@ export function sheet(title, content, opts = {}) {
     if (closed) return;
     closed = true;
     document.removeEventListener('keydown', onKey);
+    if (vv) { vv.removeEventListener('resize', fit); vv.removeEventListener('scroll', fit); }
     backdrop.classList.remove('open');
     document.body.classList.remove('no-scroll');
     setTimeout(() => backdrop.remove(), 220);

@@ -263,7 +263,7 @@ export function renderEditor(root, { id }) {
     input.addEventListener('input', draw);
     input.addEventListener('keydown', (e) => { if (e.key === 'Enter' && current[0]) { e.preventDefault(); pick(current[0]); } });
     draw();
-    const sh = sheet('Livro da Bíblia', h('div', null, input, h('p', { class: 'field-hint' }, 'Não precisa de acento. Dá para digitar a referência inteira, como “jo 3 16” ou “1co 13:4-7”.'), results), { autofocus: true });
+    const sh = sheet('Livro da Bíblia', h('div', null, input, h('p', { class: 'field-hint' }, 'Não precisa de acento. Dá para digitar a referência inteira, como “jo 3 16” ou “1co 13:4-7”.'), results), { autofocus: true, top: true });
   }
 
   function usedBooks() {
@@ -443,7 +443,7 @@ export function renderEditor(root, { id }) {
       };
       search.addEventListener('input', drawList);
       drawList();
-      const sh = sheet('Vincular pregação', h('div', null, search, listHost), { autofocus: false });
+      const sh = sheet('Vincular pregação', h('div', null, search, listHost), { autofocus: false, top: true });
     };
     return h('div', { class: 'linked' }, host, h('button', { class: 'btn btn-soft btn-block', type: 'button', onclick: pick }, icon('link'), 'Vincular a outra pregação'));
   }

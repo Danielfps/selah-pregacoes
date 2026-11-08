@@ -1,6 +1,6 @@
 /* Selah – service worker: cache offline, lembretes e notificações. */
 /* global SelahReminderCore */
-const VERSION = '1.2.0';
+const VERSION = '1.2.1';
 const CACHE = 'selah-' + VERSION;
 
 const APP_SHELL = [
