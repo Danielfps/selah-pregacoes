@@ -1,7 +1,7 @@
 // Tema, instalação (PWA) e versão do app.
 import { state, emit } from './store.js';
 
-export const APP_VERSION = '1.2.1';
+export const APP_VERSION = '1.3.0';
 
 export function applyTheme() {
   const t = state.settings.theme || 'auto';

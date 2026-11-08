@@ -9,7 +9,8 @@ import { runSync } from '../sync.js';
 import { exportBackup, importBackup } from '../backup.js';
 import { askNotificationPermission, notificationPermission, notificationsSupported } from '../reminders.js';
 import { blobs, settings as settingsDB } from '../db.js';
-import { applyTheme, APP_VERSION, promptInstall } from '../platform.js';
+import { applyTheme, APP_VERSION } from '../platform.js';
+import { openInstall } from '../install.js';
 
 export function renderSettings(root) {
   const wrap = h('div', { class: 'view view-settings' });
@@ -128,11 +129,8 @@ export function renderSettings(root) {
     // ----- Instalar -----
     if (!isStandalone()) {
       wrap.appendChild(group('Instalar no celular', 'phone',
-        state.installPrompt
-          ? h('button', { class: 'btn btn-primary btn-block', type: 'button', onclick: () => promptInstall() }, icon('download'), 'Instalar o Selah')
-          : isIOS()
-            ? h('ol', { class: 'steps' }, h('li', null, 'Abra este site no Safari.'), h('li', null, 'Toque em Compartilhar (quadrado com seta).'), h('li', null, 'Escolha “Adicionar à Tela de Início”.'))
-            : h('ol', { class: 'steps' }, h('li', null, 'Abra este site no Chrome.'), h('li', null, 'Toque no menu ⋮ (três pontinhos).'), h('li', null, 'Escolha “Adicionar à tela inicial” ou “Instalar app”.'))));
+        h('p', { class: 'set-note' }, isIOS() ? 'No iPhone, o Selah fica na Tela de Início como um app, abre em tela cheia e funciona sem internet.' : 'Instale o Selah e use como um app: abre em tela cheia, direto da tela inicial, e funciona sem internet.'),
+        h('button', { class: 'btn btn-primary btn-block', type: 'button', onclick: () => openInstall() }, icon('download'), isIOS() ? 'Pôr na Tela de Início' : 'Instalar o Selah')));
     }
 
     // ----- Sobre -----

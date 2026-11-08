@@ -78,6 +78,8 @@ Enquanto não estiver configurado, o Selah funciona normalmente, mas salva só n
 
 ## Como instalar no celular
 
+O jeito mais fácil: abra o link e toque no botão verde **Instalar** (Android) ou **Pôr na tela** (iPhone), no topo do app. Ele mostra o passo a passo certo para o seu celular. Se o link abrir dentro do Instagram ou do WhatsApp, o app avisa para abrir no navegador.
+
 ### Android (Chrome)
 1. Abra **https://danielfps.github.io/selah-pregacoes/** no **Chrome**.
 2. Toque no menu **⋮** (três pontinhos, no canto superior direito).

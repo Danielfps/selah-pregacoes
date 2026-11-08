@@ -6,6 +6,7 @@ import { searchBlob, typeLabel, SERMON_TYPES } from '../schema.js';
 import { sermonCard, emptyState } from '../components.js';
 import { dueReminders, answerReminder, weeklyPick } from '../reminders.js';
 import { enqueue } from '../sync.js';
+import { installButton } from '../install.js';
 
 // Filtros ficam em memória enquanto o app está aberto.
 const filters = { q: '', fav: false, preacher: '', book: '', tag: '', type: '' };
@@ -50,7 +51,7 @@ export function renderHome(root) {
         h('p', { class: 'eyebrow' }, greeting() + ' 👋'),
         h('h1', { class: 'brand' }, h('span', { class: 'brand-mark', 'aria-hidden': 'true' }, h('i'), h('i')), 'Selah')
       ),
-      h('p', { class: 'brand-tag' }, 'pausa para refletir')
+      installButton() || h('p', { class: 'brand-tag' }, 'pausa para refletir')
     ),
     topHost,
     h('div', { class: 'search-wrap' }, icon('search'), search),

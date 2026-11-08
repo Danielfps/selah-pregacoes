@@ -8,7 +8,8 @@ import { refreshAuthState, scheduleSync, runSync } from './sync.js';
 import { login, finishRedirectLogin, watchExpiry } from './auth.js';
 import { notifyDue, registerPeriodic, notificationPermission } from './reminders.js';
 import * as Rec from './recorder.js';
-import { applyTheme, listenInstall, promptInstall } from './platform.js';
+import { applyTheme, listenInstall } from './platform.js';
+import { openInstall } from './install.js';
 import { setSetting } from './store.js';
 import { renderHome } from './views/home.js';
 import { renderEditor } from './views/editor.js';
@@ -100,10 +101,10 @@ function drawBanners() {
     add('banner-violet', 'cloud', 'Entre com o Google para salvar suas pregações no Google Docs.',
       h('button', { class: 'banner-btn', type: 'button', onclick: () => login() }, 'Entrar'));
   }
-  if (state.installPrompt && !state.settings.installDismissed && !isStandalone() && (location.hash || '#/') === '#/') {
-    add('banner-lime', 'download', 'Instale o Selah na tela inicial para usar como app, até sem internet.',
+  if (!isStandalone() && !state.settings.installDismissed && (location.hash || '#/') === '#/') {
+    add('banner-lime', 'download', isIOS() ? 'Coloque o Selah na Tela de Início e use como app, até sem internet.' : 'Instale o Selah na tela inicial e use como app, até sem internet.',
       h('span', { class: 'banner-actions' },
-        h('button', { class: 'banner-btn', type: 'button', onclick: () => promptInstall() }, 'Instalar'),
+        h('button', { class: 'banner-btn', type: 'button', onclick: () => openInstall() }, isIOS() ? 'Como fazer' : 'Instalar'),
         h('button', { class: 'banner-x', type: 'button', 'aria-label': 'Dispensar', onclick: () => { setSetting('installDismissed', true); drawBanners(); } }, icon('x', 'ic-sm'))));
   }
 }
@@ -200,11 +201,6 @@ async function init() {
   // Lembretes.
   setTimeout(() => { notifyDue(); if (notificationPermission() === 'granted') registerPeriodic(); }, 2500);
 
-  // iPhone: dica de instalação uma vez.
-  if (isIOS() && !isStandalone() && !state.settings.iosHintShown && state.sermons.length > 0) {
-    setSetting('iosHintShown', true);
-    toast('Dica: no Safari, toque em Compartilhar › “Adicionar à Tela de Início” para instalar o Selah.', { duration: 7000 });
-  }
 }
 
 init().catch((e) => {
