@@ -33,19 +33,28 @@ async function afterLogin() {
 }
 
 /** Entrar com o Google (pop-up). Chame a partir de um toque. */
-export async function login() {
-  if (!G.isConfigured()) { location.hash = '#/configurar-google'; return false; }
-  if (!navigator.onLine) { toast('Sem internet. Conecte-se para entrar com o Google.'); return false; }
+export async function login({ silent = false } = {}) {
+  if (!G.isConfigured()) { if (!silent) location.hash = '#/configurar-google'; return false; }
+  if (!navigator.onLine) { if (!silent) toast('Sem internet. Conecte-se para entrar com o Google.'); return false; }
   try {
     const acc = state.settings.account;
     await G.signIn({ hint: acc && acc.email ? acc.email : undefined });
     await afterLogin();
-    toast('Conectado ao Google ✓');
+    if (!silent) toast('Conectado ao Google ✓');
     return true;
   } catch (e) {
-    loginErrorSheet(e);
+    if (!silent) loginErrorSheet(e);
     return false;
   }
+}
+
+/**
+ * Reconecta sem perguntar nada quando a conexão expirou (chame dentro de um toque,
+ * por exemplo no "Concluir"). Se a pessoa já autorizou antes, a janela do Google
+ * abre e fecha sozinha.
+ */
+export function reconnectIfExpired() {
+  if (G.isConfigured() && navigator.onLine && state.settings.account && !G.getToken()) login({ silent: true });
 }
 
 function loginErrorSheet(e) {
