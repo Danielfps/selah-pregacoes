@@ -26,6 +26,7 @@ Cada pregação vira um **documento do Google Docs** na sua conta Google, bem fo
 - Compartilhar um resumo bonito pelo WhatsApp (ou copiar o texto).
 - **Lembrete de aplicação:** alguns dias depois, “Você colocou em prática o que ouviu?”
   (notificação quando o navegador permite e cartão na tela inicial).
+- **Horários do culto:** cadastre os dias e horários (Ajustes › Lembretes). Na hora, o app mostra “Hora de anotar a pregação” e pode criar um lembrete semanal no calendário do celular (Google Agenda ou Calendário do iPhone), que avisa mesmo com o app fechado.
 - **Relembre:** toda semana, uma pregação antiga sorteada com a frase marcante.
 - **Estatísticas:** total, livros mais pregados, pregadores mais ouvidos, etiquetas, sequência de semanas e % de aplicações feitas.
 - Tema claro/escuro e backup `.json` (exportar/importar).
@@ -93,6 +94,10 @@ O jeito mais fácil: abra o link e toque no botão verde **Instalar** (Android) 
 4. Abra o Selah pelo ícone. (Notificações no iPhone exigem iOS 16.4+ e o app instalado na Tela de Início.)
 
 ---
+
+## Atualizações
+
+Quem já instalou **não precisa de link novo**. Ao abrir o app com internet, ele baixa a versão nova sozinho e mostra o aviso **“Tem novidade no Selah! – Atualizar”**. Um toque e pronto (os dados não são apagados). Depois aparece a lista de novidades.
 
 ## Como fazer backup
 

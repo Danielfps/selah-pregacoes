@@ -1,6 +1,6 @@
 /* Selah – service worker: cache offline, lembretes e notificações. */
 /* global SelahReminderCore */
-const VERSION = '1.3.0';
+const VERSION = '1.4.0';
 const CACHE = 'selah-' + VERSION;
 
 const APP_SHELL = [
@@ -22,6 +22,7 @@ const APP_SHELL = [
   'js/backup.js',
   'js/bible-search.js',
   'js/components.js',
+  'js/cultos.js',
   'js/db.js',
   'js/docbuilder.js',
   'js/google.js',
@@ -148,6 +149,11 @@ async function checkReminders() {
   if (!db.objectStoreNames.contains('sermons')) return;
   const [sermons, rows] = await Promise.all([getAll(db, 'sermons'), getAll(db, 'settings')]);
   const settings = Object.fromEntries(rows.map((r) => [r.key, r.value]));
+  const c = SelahReminderCore.cultNow(settings.cultSlots || [], Date.now());
+  if (c && !(settings.cultNotified || {})[c.key]) {
+    await self.registration.showNotification('Hora do culto! 🙌', { body: 'Abra o Selah e anote a pregação de hoje.', tag: 'selah-culto', icon: 'icons/icon-192.png', data: { url: '#/nova' } });
+    await new Promise((resolve) => { const tx = db.transaction('settings', 'readwrite'); tx.objectStore('settings').put({ key: 'cultNotified', value: { [c.key]: Date.now() } }); tx.oncomplete = resolve; tx.onerror = resolve; });
+  }
   const due = SelahReminderCore.toNotify(sermons, settings).slice(0, 3);
   for (const s of due) {
     await self.registration.showNotification('Você colocou em prática o que ouviu?', {

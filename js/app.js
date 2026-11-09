@@ -1,5 +1,5 @@
 // Ponto de entrada: inicialização, rotas, barra de navegação, avisos e service worker.
-import { h, clear, uid, nowLocalInput, toast, isStandalone, isIOS } from './util.js';
+import { h, clear, uid, nowLocalInput, toast, isStandalone, isIOS, sheet } from './util.js';
 import { icon } from './icons.js';
 import { state, on, emit, loadAll, putSermon, refreshQueueCount } from './store.js';
 import { emptySermon } from './schema.js';
@@ -10,6 +10,8 @@ import { notifyDue, registerPeriodic, notificationPermission } from './reminders
 import * as Rec from './recorder.js';
 import { applyTheme, listenInstall } from './platform.js';
 import { openInstall } from './install.js';
+import { notifyCult } from './cultos.js';
+import { APP_VERSION } from './platform.js';
 import { setSetting } from './store.js';
 import { renderHome } from './views/home.js';
 import { renderEditor } from './views/editor.js';
@@ -66,7 +68,10 @@ async function doRoute() {
 
 async function newSermon() {
   const id = uid();
-  await putSermon(emptySermon(id, state.settings.defaultMode, nowLocalInput()));
+  const rec = emptySermon(id, state.settings.defaultMode, nowLocalInput());
+  const place = sessionStorage.getItem('selah.newPlace');
+  if (place) { rec.place = place; sessionStorage.removeItem('selah.newPlace'); }
+  await putSermon(rec);
   location.replace(`#/p/${id}/editar`);
   return null;
 }
@@ -90,7 +95,7 @@ function drawBanners() {
     icon(ic), h('span', { class: 'banner-text' }, text), action || null));
 
   if (state.swWaiting) {
-    add('banner-violet', 'sparkle', 'Nova versão do Selah disponível.', h('button', { class: 'banner-btn', type: 'button', onclick: () => state.swWaiting.postMessage('skipWaiting') }, 'Atualizar'));
+    add('banner-violet', 'sparkle', 'Tem novidade no Selah! Toque em Atualizar (leva 2 segundos, nada é perdido).', h('button', { class: 'banner-btn', type: 'button', onclick: () => { toast('Atualizando…'); state.swWaiting.postMessage('skipWaiting'); } }, 'Atualizar'));
   }
   if (!state.online) {
     add('banner-dark', 'wifiOff', 'Sem internet. Tudo continua salvo no aparelho e vai para o Docs quando voltar.');
@@ -121,6 +126,18 @@ function drawGlobalRec() {
     h('span', { class: 'rec-open' }, 'Abrir', icon('chevronRight', 'ic-sm'))));
 }
 
+// ---------- Novidades da versão ----------
+const NEWS = {
+  '1.4.0': ['🔔 Lembrete na hora do culto: cadastre os horários em Ajustes › Lembretes.', '📅 Leve os horários para o calendário do celular.', '⬆️ O app agora se atualiza sozinho com um toque.'],
+};
+function showWhatsNew() {
+  let seen = '';
+  try { seen = localStorage.getItem('selah.version') || ''; localStorage.setItem('selah.version', APP_VERSION); } catch (_) { return; }
+  if (!seen || seen === APP_VERSION || !NEWS[APP_VERSION]) return;
+  setTimeout(() => sheet(`Selah atualizado ✓ (versão ${APP_VERSION})`, h('div', null,
+    h('ul', { class: 'news' }, NEWS[APP_VERSION].map((n) => h('li', null, n))))), 900);
+}
+
 // ---------- Service worker ----------
 async function registerSW() {
   if (!('serviceWorker' in navigator)) return;
@@ -143,7 +160,9 @@ async function registerSW() {
     navigator.serviceWorker.addEventListener('message', (e) => {
       if (e.data && e.data.type === 'navigate' && e.data.url) location.hash = e.data.url.replace(/^.*#/, '#');
     });
-    setInterval(() => reg.update().catch(() => {}), 60 * 60 * 1000);
+    setInterval(() => reg.update().catch(() => {}), 30 * 60 * 1000);
+    // Procura versão nova sempre que o app volta para a tela.
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') reg.update().catch(() => {}); });
   } catch (e) {
     console.warn('Service worker não registrado', e);
   }
@@ -177,6 +196,8 @@ async function init() {
       refreshAuthState();
       scheduleSync(300);
       notifyDue();
+      notifyCult();
+      if ((location.hash || '#/') === '#/') emit('settings');
     }
   });
   on('auth', drawBanners);
@@ -185,6 +206,7 @@ async function init() {
   on('rec', drawGlobalRec);
 
   registerSW();
+  showWhatsNew();
 
   // Recupera gravações interrompidas.
   Rec.recoverOrphans().then((list) => { if (list.length) { toast(`Recuperamos ${list.length === 1 ? 'uma gravação interrompida' : list.length + ' gravações interrompidas'} ✓`); list.forEach((x) => scheduleSync(1000)); } });
@@ -199,7 +221,7 @@ async function init() {
   setInterval(() => { if (state.queueCount && navigator.onLine) runSync(); }, 60_000);
 
   // Lembretes.
-  setTimeout(() => { notifyDue(); if (notificationPermission() === 'granted') registerPeriodic(); }, 2500);
+  setTimeout(() => { notifyCult(); notifyDue(); if (notificationPermission() === 'granted') registerPeriodic(); }, 2500);
 
 }
 

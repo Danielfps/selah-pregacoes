@@ -1,12 +1,13 @@
 // Tela inicial: lembretes, "Relembre", busca, filtros e lista de pregações.
 import { h, clear, norm, monthLabel, greeting, sheet, fmtDate, plural } from '../util.js';
 import { icon } from '../icons.js';
-import { state, on, sortedSermons, patchSermon } from '../store.js';
+import { state, on, sortedSermons, patchSermon, setSetting } from '../store.js';
 import { searchBlob, typeLabel, SERMON_TYPES } from '../schema.js';
 import { sermonCard, emptyState } from '../components.js';
 import { dueReminders, answerReminder, weeklyPick } from '../reminders.js';
 import { enqueue } from '../sync.js';
 import { installButton } from '../install.js';
+import { cultNow, slots as cultSlots, slotLabel, startFromCult, openCultEditor } from '../cultos.js';
 
 // Filtros ficam em memória enquanto o app está aberto.
 const filters = { q: '', fav: false, preacher: '', book: '', tag: '', type: '' };
@@ -65,11 +66,35 @@ export function renderHome(root) {
   function drawTop() {
     clear(topHost);
     if (hasFilters()) return;
+    // Hora do culto
+    const c = cultNow();
+    if (c) topHost.appendChild(cultCard(c));
+    else if (!cultSlots().length && state.sermons.length >= 1 && !state.settings.cultTipDismissed) topHost.appendChild(cultTip());
     // Lembretes de aplicação
     for (const s of dueReminders().slice(0, 2)) topHost.appendChild(reminderCard(s));
     // Relembre
     const pick = weeklyPick(pickOffset);
     if (pick) topHost.appendChild(relembreCard(pick));
+  }
+
+  function cultCard(c) {
+    const started = Date.now() >= c.start;
+    return h('section', { class: 'card card-cult', 'aria-label': 'Hora do culto' },
+      h('p', { class: 'eyebrow' }, icon('bell'), started ? 'O culto começou' : 'O culto já vai começar'),
+      h('h2', { class: 'card-h' }, 'Hora de anotar a pregação ✍️'),
+      h('p', { class: 'card-sub' }, slotLabel(c.slot)),
+      h('div', { class: 'card-actions' },
+        h('button', { class: 'btn btn-primary', type: 'button', onclick: () => startFromCult(c.slot) }, icon('plus'), 'Anotar agora')));
+  }
+
+  function cultTip() {
+    return h('section', { class: 'card card-tip' },
+      h('p', { class: 'eyebrow' }, icon('calendar'), 'Dica'),
+      h('h2', { class: 'card-h' }, 'Quer um lembrete na hora do culto?'),
+      h('p', { class: 'card-sub' }, 'Cadastre os dias e horários dos seus cultos e o Selah avisa para você anotar.'),
+      h('div', { class: 'card-actions' },
+        h('button', { class: 'btn btn-soft', type: 'button', onclick: () => openCultEditor(refresh) }, icon('plus'), 'Cadastrar horários'),
+        h('button', { class: 'btn btn-ghost', type: 'button', onclick: () => setSetting('cultTipDismissed', true) }, 'Agora não')));
   }
 
   function reminderCard(s) {

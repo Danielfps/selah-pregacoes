@@ -753,3 +753,17 @@ body.is-editor #toast { bottom: calc(100px + var(--safe-b)); }
 .inst-arrow { display: flex; justify-content: center; color: var(--primary-ink); animation: nudge 1s ease-in-out infinite; }
 .inst-arrow .ic { width: 32px; height: 32px; }
 @keyframes nudge { 50% { transform: translateY(6px); } }
+
+/* ---------- Horários do culto ---------- */
+.card-cult { background: var(--primary-tint); box-shadow: 4px 4px 0 var(--primary); }
+.card-cult .eyebrow { color: var(--primary-ink); }
+.card-cult .card-h { margin: 6px 0 2px; font-size: 21px; }
+.card-tip .card-h { margin: 6px 0 2px; }
+.cult-list { display: flex; flex-direction: column; gap: 8px; }
+.cult-item { display: grid; grid-template-columns: 1fr auto 44px; gap: 8px; align-items: center; padding: 8px 8px 8px 14px; border: 2px solid var(--line); border-radius: 16px; background: var(--surface); }
+.cult-when { display: flex; flex-direction: column; min-width: 0; }
+.cult-when b { font: 700 16px var(--font-title); }
+.cult-when span { font: 600 15px var(--font-title); color: var(--primary-ink); }
+.cult-when small { font-size: 13px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cult-cal { display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 16px; background: var(--lime-tint); border: 2px solid var(--line); }
+.news { margin: 0; padding-left: 4px; list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 16px; }

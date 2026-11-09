@@ -11,6 +11,7 @@ import { askNotificationPermission, notificationPermission, notificationsSupport
 import { blobs, settings as settingsDB } from '../db.js';
 import { applyTheme, APP_VERSION } from '../platform.js';
 import { openInstall } from '../install.js';
+import { slots as cultSlots, slotLabel, openCultEditor } from '../cultos.js';
 
 export function renderSettings(root) {
   const wrap = h('div', { class: 'view view-settings' });
@@ -68,7 +69,10 @@ export function renderSettings(root) {
     const days = h('select', { class: 'input select sm', 'aria-label': 'Dias depois', onchange: (e) => setSetting('reminderDays', Number(e.target.value)) },
       [1, 2, 3, 4, 5, 7].map((d) => h('option', { value: String(d) }, `${d} ${d === 1 ? 'dia' : 'dias'}`)));
     days.value = String(state.settings.reminderDays || 3);
+    const cs = cultSlots();
     wrap.appendChild(group('Lembretes', 'bell',
+      row('Horários do culto', cs.length ? cs.map(slotLabel).join(' · ') : 'Avisa na hora do culto para você anotar',
+        h('button', { class: 'btn btn-soft sm', type: 'button', onclick: () => openCultEditor(draw) }, icon('calendar'), cs.length ? 'Editar' : 'Adicionar')),
       row('Lembrete de aplicação', '“Você colocou em prática o que ouviu?”', toggle(state.settings.reminderEnabled !== false, async (v) => { await setSetting('reminderEnabled', v); draw(); }, 'Lembrete de aplicação')),
       state.settings.reminderEnabled !== false ? row('Perguntar depois de', null, days) : null,
       row('Notificações', perm === 'granted' ? 'Ativadas ✓' : perm === 'denied' ? 'Bloqueadas nas configurações do navegador' : perm === 'unsupported' ? (isIOS() && !isStandalone() ? 'No iPhone, instale o app na Tela de Início para receber notificações' : 'Este navegador não oferece notificações') : 'O lembrete também aparece como cartão no início',
